@@ -30,7 +30,7 @@ Note: the TTN.py map and coordinate logic were adapted from an old release of [K
 - [ttnhere.sh](https://github.com/wryandginger/headless-HERE-TTN/blob/main/ttnhere.sh)  - A bash script that first runs the TTN and then the HERE python files, takes a break and then restarts in an endless loop.
 
 
-# How To Install and Run
+# How To Install and Run:
 1. Download the contents of this repo to the home directory of your linux install
 2. Edit ttn.py and/or here.py for your desired frequency and timezone. (This is automatically configured for Seattle, WA)
    - ttn.py requires tuning to an iHeartRadio station (95.7 MHz or 106.1 MHz in Seattle)
@@ -44,3 +44,9 @@ Note: the TTN.py map and coordinate logic were adapted from an old release of [K
 ```
 7. To be safe, make sure you have a ttn and here folder inside /config/www on your Home Assistant installation.
 8. Reboot your server and the ttnhere.sh script should collect the Traffic and Weather data every 5 minutes.
+
+# Home Assistant Tips:
+- Consider using a USB switch like the [Sonoff ZB Micro](https://www.amazon.com/SONOFF-ZBMicro-Zigbee-Switch-1-Pack/dp/B0CR1FTWT8/) to turn off power to the SDR between cycles. 
+- A cooler SDR lasts longer and tunes in faster.
+- Use the Filesize integration to monitor the here.gif file (here.gif is the last file uploaded in a cycle). Turn on the disabled "Last Updated" diagnostic sensor.
+- Make an automation that is triggered when sensor.here_gif_size changes. Turn off the switch for the SDR for 3 minutes, then turn it back on.
