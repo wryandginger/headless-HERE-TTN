@@ -1,32 +1,41 @@
 #!/usr/bin/env python3
 
-import datetime
 import os
 import re
 import shutil
 import subprocess
 import time
+from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 from PIL import Image, ImageDraw, ImageFont
 
 # Configurations
 HOME_DIR = Path.home()
-DEST_DIR = Path("/somewhere")
+TEMP_DIR = HOME_DIR / "temp"
+DEST_DIR = HOME_DIR / "outputs/here"
 TARGET_COUNT = 10
-COMMAND = ["nrsc5", "97.3", "0", "-o", "1.png", "--dump-aas-files", str(HOME_DIR)]
+TZ = "America/Los_Angeles"
+FREQ = "97.3"
+PROGRAM = "0"
+TIMEOUT_SECONDS = 300  # 5 minutes maximum runtime limit
+
+# nrsc5 output name must end in .png; AAS files dump to ~/temp
+COMMAND = ["nrsc5", FREQ, PROGRAM, "-o", os.path.join(TEMP_DIR, "1.png"), "--dump-aas-files", str(TEMP_DIR)]
 
 
 def get_captured_files():
-    """Finds all matching PNG files dumped by nrsc5 in the home directory."""
+    """Finds all matching PNG files dumped by nrsc5 in the temp directory."""
     pattern = re.compile(
         r"^\d+_(trafficMap_[0-2]_[0-2]|WeatherImage_[0-2]_[0-2])_[a-zA-Z0-9]+\.png$"
     )
-    all_pngs = HOME_DIR.glob("*.png")
+    if not TEMP_DIR.exists():
+        return []
+    all_pngs = TEMP_DIR.glob("*.png")
     return [f for f in all_pngs if pattern.match(f.name)]
 
 
-def get_font(size):
+def get_large_font(size):
     """Attempts to load a standard TrueType font to support custom sizing."""
     font_paths = [
         "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
@@ -67,43 +76,26 @@ def process_images(files):
             tile = tile.resize((200, 200))
             canvas.paste(tile, (col * 200, row * 200))
 
-    # 2. Add Timestamp to Traffic Map (Pacific Time, Black, Larger with Overlay Box)
-    overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(overlay)
+    # 2. Add Timestamp to Traffic Map using exact requested format
+    # Enforce configured time zone for timestamping
+    draw = ImageDraw.Draw(canvas)
+    local_time = datetime.now(ZoneInfo(TZ))
+    timestamp_str = local_time.strftime("%m/%d %H:%M")
+    
+    font = get_large_font(size=24)
+    
+    # Calculate box bounds dynamically or use padding adjustments
+    text_w = 170
+    text_h = 30
+    text_x = 600 - text_w - 10
+    text_y = 600 - text_h - 10
+    
+    # Draw background box and text overlay
+    draw.rectangle([text_x - 5, text_y - 2, 590, 590], fill="black")
+    draw.text((text_x, text_y), timestamp_str, fill="white", font=font)
 
-    pacific_tz = ZoneInfo("America/Los_Angeles")
-    timestamp = datetime.datetime.now(pacific_tz).strftime("%m/%d %H:%M")
-
-    font = get_font(size=24)
-
-    # Calculate exact text dimensions to size the background box dynamically
-    text_bbox = draw.textbbox((0, 0), timestamp, font=font)
-    text_width = text_bbox[2] - text_bbox[0]
-    text_height = text_bbox[3] - text_bbox[1]
-
-    # Target position for the text (bottom-right area)
-    text_x = 580 - text_width
-    text_y = 580 - text_height
-
-    # Define background box padding
-    padding_x = 8
-    padding_y = 6
-
-    box_x1 = text_x - padding_x
-    box_y1 = text_y - padding_y
-    box_x2 = text_x + text_width + padding_x
-    box_y2 = text_y + text_height + padding_y
-
-    # Draw semi-transparent white box (Alpha = 180 out of 255)
-    draw.rectangle([box_x1, box_y1, box_x2, box_y2], fill=(255, 255, 255, 180))
-
-    # Draw the text in black color on top of the box
-    draw.text((text_x, text_y), timestamp, fill="black", font=font)
-
-    # Composite the overlay layer onto the main map canvas
-    canvas = Image.alpha_composite(canvas, overlay)
-
-    traffic_path = HOME_DIR / "trafficmap.png"
+    # Save initial map to temp directory
+    traffic_path = TEMP_DIR / "trafficmapHERE.png"
     canvas.save(traffic_path)
     print(f"Created base traffic map: {traffic_path}")
 
@@ -114,7 +106,7 @@ def process_images(files):
             weather_img = weather_img.resize((600, 600)).convert("RGBA")
             weather_canvas.alpha_composite(weather_img)
 
-        weather_path = HOME_DIR / "weatherimg.png"
+        weather_path = TEMP_DIR / "weatherimgHERE.png"
         weather_canvas.save(weather_path)
         print(f"Created weather overlay map: {weather_path}")
     else:
@@ -124,18 +116,20 @@ def process_images(files):
     # 4. Move outputs to destination folder using shutil.move (cross-drive safe)
     DEST_DIR.mkdir(parents=True, exist_ok=True)
     if traffic_path.exists():
-        shutil.move(str(traffic_path), str(DEST_DIR / "trafficmap.png"))
+        shutil.move(str(traffic_path), str(DEST_DIR / "trafficmapHERE.png"))
     if weather_path and weather_path.exists():
-        shutil.move(str(weather_path), str(DEST_DIR / "weatherimg.png"))
+        shutil.move(str(weather_path), str(DEST_DIR / "weatherimgHERE.png"))
 
     print(f"Successfully moved final files to {DEST_DIR}")
 
 
-def cleanup_home():
-    """Deletes all png and jpg files from the home directory."""
-    print("Cleaning up image files from home directory...")
+def cleanup_temp():
+    """Deletes all png and jpg files from the temp directory."""
+    print("Cleaning up image files from temp directory...")
+    if not TEMP_DIR.exists():
+        return
     for ext in ("*.png", "*.jpg", "*.jpeg"):
-        for filepath in HOME_DIR.glob(ext):
+        for filepath in TEMP_DIR.glob(ext):
             try:
                 filepath.unlink()
             except Exception as e:
@@ -144,10 +138,15 @@ def cleanup_home():
 
 
 def main():
+    # Ensure temp directory exists before starting nrsc5
+    TEMP_DIR.mkdir(parents=True, exist_ok=True)
+
     print(f"Starting nrsc5 command...")
     process = subprocess.Popen(
         COMMAND, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
     )
+
+    start_time = time.time()
 
     try:
         while True:
@@ -157,6 +156,11 @@ def main():
 
             if count >= TARGET_COUNT:
                 print(f"\nTarget of {TARGET_COUNT} files reached.")
+                break
+
+            # Check if execution time has exceeded the configured 5-minute timeout
+            if (time.time() - start_time) >= TIMEOUT_SECONDS:
+                print(f"\nTimeout limit of {TIMEOUT_SECONDS} seconds reached. Ending capture loop.")
                 break
 
             time.sleep(2)
@@ -169,8 +173,10 @@ def main():
     captured_files = get_captured_files()
     if len(captured_files) >= TARGET_COUNT:
         process_images(captured_files)
+    else:
+        print(f"Aborting image generation: Only found {len(captured_files)}/{TARGET_COUNT} files.")
 
-    cleanup_home()
+    cleanup_temp()
 
 
 if __name__ == "__main__":
