@@ -1,35 +1,44 @@
 # headless-HERE-TTN
-A pair of python scripts that pull and assemble HERE and TTN Traffic and Weather data from nrsc5.
+A set of python scripts that pull and assemble HERE and TTN Traffic and Weather data from nrsc5.
 This is designed to be run as a cronjob periodically so you can see weather and traffic on other devices.
 
-For example, the files would be awesome on a Home Assistant dashboard.
+(This was vibecoded, but I did my best to clean up the code. Sorry.) 
 
-(this was vibecoded, but I did my best to clean up the code. sorry.) 
-
-Note: the TTN.py script's map and coordinate logic were adapted from an old commit of KYDronePilot/hdfm.
+Note: the TTN.py map and coordinate logic were adapted from an old release of [KYDronePilot/hdfm](https://github.com/KYDronePilot/hdfm), which is licensed under GPL-3.
 
 # Requirements:
 - An SDR Dongle (nooelec smart nesdr, rtl-sdr, etc.)
-- A working install of nrsc5 (https://github.com/theori-io/nrsc5)
+- A working install of [nrsc5](https://github.com/theori-io/nrsc5)
 - Python 3
 - Pillow
-- This assumes you're running some flavor of debian linux
+- A server running debian linux
+- An installation of Home Assistant with Samba access
 
-# How to get HERE data:
-1. Download here.py to your home directory.
-2. Adjust here.py Configurations to your desired frequency, destination path, and time zone.
-3. Make sure you're running this on a station that broadcasts HERE data (e.g. Audacy and Bonneville stations.)
-4. Run: python3 here.py
-5. The program will quit when assembled.
+# What's included:
+- TTN.py  - Runs nrsc5 for up to 5 minutes while the TTN weather and traffice data is received by your SDR. Once the files are received, nrsc5 stops and final images are assembled in ~/outputs/ttn
+- gif_ttn.py - Takes the TTN files located in ~/outputs/ttn and:
+   1. Makes a copy of the weather image and saves it in ~/outputs/ttn/gif
+   2. It creates a gif from the last 15 radar images
+   3. Uploads the TTN traffic, weather, and gif to /config/www/ttn on your Home Assistant instance
+   4. Cleans up / deletes the files you uploaded from the server
+- HERE.py  - Runs nrsc5 for up to 5 minutes while the HERE weather and traffice data is received by your SDR. Once the files are received, nrsc5 stops and final images are assembled in ~/outputs/here
+- gif_here.py - Takes the here files located in ~/outputs/here and:
+   1. Makes a copy of the weather image and saves it in ~/outputs/here/gif
+   2. It creates a gif from the last 15 radar images
+   3. Uploads the TTN traffic, weather, and gif to /config/www/here on your Home Assistant instance
+   4. Cleans up / deletes the files you uploaded from the server
+- ttnhere.sh  - A bash script that first runs the TTN and then the HERE python files, takes a break and then restarts in an endless loop.
 
-# How to get TTN data:
-1. Download the temp folder and ttn.py to your home directory.
-2. Adjust ttn.py Configurations to your desired frequency, destination path, and time zone.
-3. Make sure you're running this on a station that broadcasts TTN data (e.g. iHeartRadio stations.)
-4. Run: python3 ttn.py
-5. The program will quit when assembled.
 
-# Want Both?:
-1. Follow the steps above
-2. Run: python3 here.py && python3 ttn.py
-3. The program will quit when assembled.
+# How To Install and Run
+1. Download the contents of this repo to the home directory of your linux install
+2. Edit ttn.py and/or here.py for your desired frequency and timezone. (This is automatically configured for Seattle, WA)
+3. Edit gif_ttn.py and/or for the IP and Samba credentials of your Home Assistant Image
+4. Edit the ttnhere.sh script so it directs to the correct home directory
+5. Optionally, you can disable TTN or HERE data in the ttnhere.sh file if you want to exclude one data source.
+6. Run crontab -e (not as root) and add the following to the bottom:
+```
+@reboot /bin/bash /home/USER/ttnhere.sh > /dev/null 2>&1
+```
+7. To be safe, make sure you have a ttn and here folder inside /config/www on your Home Assistant installation.
+8. Reboot your server and the ttnhere.sh script should collect the Traffic and Weather data every 5 minutes.
