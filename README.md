@@ -1,5 +1,5 @@
-# headless-HERE
-A python script that pulls and assembles HERE Traffic and Weather data from nrsc5.
+# headless-HERE-TTN
+A python script that pulls and assembles HERE and TTN Traffic and Weather data from nrsc5.
 This is designed to be run as a cronjob periodically so you can see weather and traffic on other devices.
 
 For example, the files would be awesome on a Home Assistant dashboard.
@@ -13,10 +13,21 @@ For example, the files would be awesome on a Home Assistant dashboard.
 - Pillow
 - This assumes you're running some flavor of debian linux
 
-# How to:
+# How to get HERE data:
 1. Download here.py to your home directory.
-2. Adjust here.py Configurations to your desired frequency, and destination path.
+2. Adjust here.py Configurations to your desired frequency, destination path, and time zone.
 3. Make sure you're running this on a station that broadcasts HERE data (e.g. Audacy and Bonneville stations.)
 4. Run: python3 here.py
 5. The program will quit when assembled.
-   
+
+# How to get TTN data:
+1. Download the temp folder and ttn.py to your home directory.
+2. Adjust ttn.py Configurations to your desired frequency, destination path, and time zone.
+3. Make sure you're running this on a station that broadcasts TTN data (e.g. iHeartRadio stations.)
+4. Run: python3 ttn.py
+5. The program will quit when assembled.
+
+# Want Both?:
+1. Follow the steps above
+2. Run: python3 here.py && python3 ttn.py
+3. The program will quit when assembled.
