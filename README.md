@@ -1,7 +1,9 @@
 # headless-HERE
 A python script that pulls and assembles HERE Traffic and Weather data from nrsc5.
 This is designed to be run as a cronjob periodically so you can see weather and traffic on other devices.
+
 For example, the files would be awesome on a Home Assistant dashboard.
+
 (this was vibecoded, but I did my best to clean up the code. sorry)
 
 # Requirements:
