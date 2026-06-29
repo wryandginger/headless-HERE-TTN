@@ -1,0 +1,20 @@
+# headless-HERE
+A python script that pulls and assembles HERE Traffic and Weather data from nrsc5.
+This is designed to be run as a cronjob periodically so you can see weather and traffic on other devices.
+For example, the files would be awesome on a Home Assistant dashboard.
+(this was vibecoded, but I did my best to clean up the code. sorry)
+
+# Requirements:
+- An SDR Dongle (nooelec smart nesdr, rtl-sdr, etc.)
+- A working install of nrsc5 (https://github.com/theori-io/nrsc5)
+- Python 3
+- Pillow
+- This assumes you're running some flavor of debian linux
+
+# How to:
+1. Download here.py to your home directory.
+2. Adjust here.py Configurations to your desired frequency, and destination path.
+3. Make sure you're running this on a station that broadcasts HERE data (e.g. Audacy and Bonneville stations.)
+4. Run: python3 here.py
+5. The program will quit when assembled.
+   
