@@ -4,7 +4,7 @@ This is designed to be run as a cronjob periodically so you can see weather and 
 
 (This was vibecoded, but I did my best to clean up the code. Sorry.) 
 
-Note: the TTN.py map and coordinate logic were adapted from an old release of [KYDronePilot/hdfm](https://github.com/KYDronePilot/hdfm), which is licensed under GPL-3.
+Note: the TTN.py map and coordinate logic were adapted from an old fork of [KYDronePilot/hdfm](https://github.com/KYDronePilot/hdfm), licensed under GPL-3.
 <div align="center">
    <img src="https://github.com/wryandginger/headless-HERE-TTN/blob/main/temp/trafficmapTTN.png?raw=true" width=30%">
    <img src="https://github.com/wryandginger/headless-HERE-TTN/blob/main/temp/trafficmapHERE.png?raw=true" width=30%">
