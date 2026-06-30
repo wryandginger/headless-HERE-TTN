@@ -2,9 +2,10 @@
 A set of python scripts that pull and assemble HERE and TTN Traffic and Weather data from nrsc5.
 This is designed to be run as a cronjob periodically so you can see weather and traffic on a Home Assistant dashboard.
 
-(This was vibecoded, but I did my best to clean up the code. Sorry.) 
-
-Note: the TTN.py map and coordinate logic were adapted from an old fork of [KYDronePilot/hdfm](https://github.com/KYDronePilot/hdfm), licensed under GPL-3.
+- This was vibecoded, but I did my best to clean up the code. Sorry.
+- ttn.py map and coordinate logic were adapted from an old fork of [KYDronePilot/hdfm](https://github.com/KYDronePilot/hdfm), licensed under GPL-3.
+- ttn_osm.py is an optional replacement of ttn.py using an [Open Street Maps API](https://wiki.openstreetmap.org/wiki/Raster_tile_providers) to generate a custom map.
+  
 <div align="center">
    <img src="https://github.com/wryandginger/headless-HERE-TTN/blob/main/temp/trafficmapTTN.png?raw=true" width=30%">
    <img src="https://github.com/wryandginger/headless-HERE-TTN/blob/main/temp/trafficmapHERE.png?raw=true" width=30%">
@@ -18,7 +19,8 @@ Note: the TTN.py map and coordinate logic were adapted from an old fork of [KYDr
 - An installation of Home Assistant with Samba access on a different machine
 
 # What's included:
-- [TTN.py](https://github.com/wryandginger/headless-HERE-TTN/blob/main/ttn.py)  - Runs nrsc5 for up to 5 minutes while the TTN weather and traffice data is received by your SDR. Once the files are received, nrsc5 stops and final images are assembled in ~/outputs/ttn
+- [ttn.py](https://github.com/wryandginger/headless-HERE-TTN/blob/main/ttn.py)  - Runs nrsc5 for up to 5 minutes while the TTN weather and traffice data is received by your SDR. Once the files are received, nrsc5 stops and final images are assembled in ~/outputs/ttn
+- [ttn_osm.py](https://github.com/wryandginger/headless-HERE-TTN/blob/main/ttn_osm.py)  - This is an optional replacement file for ttn.py. Instead of downloading KYDronePilot's map, this manually generates a map using an Open Street Maps compatible API. (Stadia, Carto, ESRI, etc.).
 - [gif_ttn.py](https://github.com/wryandginger/headless-HERE-TTN/blob/main/gif_ttn.py) - Takes the TTN files located in ~/outputs/ttn and:
    1. Makes a copy of the weather image and saves it in ~/outputs/ttn/gif
    2. It creates a gif from the last 15 radar images
@@ -35,9 +37,16 @@ Note: the TTN.py map and coordinate logic were adapted from an old fork of [KYDr
 
 # How To Install and Run:
 1. Download the contents of this repo to the home directory of your linux install
-2. Edit ttn.py and/or here.py for your desired frequency and timezone. (This is automatically configured for Seattle, WA)
+2. Edit ttn.py, ttn_osm.py, and/or here.py for your desired frequency and timezone. (These are automatically configured for Seattle, WA)
    - ttn.py requires tuning to an iHeartRadio station (95.7 MHz or 106.1 MHz in Seattle)
    - here.py requires tuning to an Audacy station (99.9 MHz or 100.7 in Seattle) or Bonneville station (97.3 MHz in Seattle)
+  
+   NEW / Optional:
+   - ttn_osm.py must be carefully configured to your specific OSM provider (read the shebangs). A list of providers is linked in the script.
+   - You can rename ttn_osm.py to ttn.py OR you must edit ttnhere.sh to launch this optional script automatically.
+   - This should be more than compliant with most API provider rules. Since this script caches the map, you're only using the API once.
+   - You should use ttn_osm.py if you're wanting a different map style. (e.g. a dark map)
+   
 4. Edit gif_ttn.py and/or gif_here.py for the IP and Samba credentials of your Home Assistant instance
 5. Edit the ttnhere.sh script so it directs to the correct home directory
 6. Optionally, you can disable TTN or HERE data in the ttnhere.sh file if you want to exclude one data source.
