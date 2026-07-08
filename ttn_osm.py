@@ -7,6 +7,7 @@ import math
 import shutil
 import subprocess
 import urllib.request
+import sys
 from zoneinfo import ZoneInfo
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
@@ -19,7 +20,11 @@ MAP_DIR = os.path.join(TEMP_DIR, "map")
 MAP_PATH = os.path.join(MAP_DIR, "map.png")
 DEST_DIR = os.path.expanduser("~/outputs/ttn")
 TZ = "America/Los_Angeles"
-TIMEOUT_SECONDS = 300  # Give up after 5 minutes
+TIMEOUT_SECONDS = 400  # Give up after 400 sec
+
+# New: switch frequency after this many seconds
+SWITCH_AFTER_SECONDS = 200
+NEW_FREQ = "96.5"
 
 # Ensure directories exist
 os.makedirs(TEMP_DIR, exist_ok=True)
@@ -120,9 +125,24 @@ def download_basemap(lat1, lon1, lat2, lon2):
     basemap.save(MAP_PATH)
     print(f"Basemap saved to {MAP_PATH} with dimensions {basemap.size}")
 
+def make_command(freq):
+    return ["nrsc5", freq, CHANNEL, "-o", os.path.join(TEMP_DIR, "1.png"), "--dump-aas-files", TEMP_DIR]
+
+def print_progress_inline(tmt_count, dwro_count, txt_count, current_freq, prev_len, start_time):
+    """Print a single-line status update and return the printed length."""
+    elapsed = int(time.time() - start_time)
+    s = f"[{tmt_count}/9] T:{tmt_count} W:{dwro_count} TXT:{txt_count} freq:{current_freq} elapsed:{elapsed}s"
+    pad = ""
+    if prev_len > len(s):
+        pad = " " * (prev_len - len(s))
+    sys.stdout.write("\r" + s + pad)
+    sys.stdout.flush()
+    return len(s)
+
 def monitor_and_harvest():
-    """Runs nrsc5 and prints progress, terminating gracefully if target is reached or timeout occurs."""
-    cmd = ["nrsc5", FREQ, CHANNEL, "-o", os.path.join(TEMP_DIR, "1.png"), "--dump-aas-files", TEMP_DIR]
+    """Runs nrsc5 and prints progress inline, terminating immediately if nrsc5 crashes."""
+    current_freq = FREQ
+    cmd = make_command(current_freq)
     print(f"Starting command: {' '.join(cmd)}")
     
     process = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -132,14 +152,52 @@ def monitor_and_harvest():
     tmt_pattern = re.compile(r'_TMT_.*_([1-3])_([1-3])_')
     
     start_time = time.time()
-    
+    prev_len = 0
+    switched = False
+
     try:
         while True:
             # Check timeout condition
             elapsed_time = time.time() - start_time
             if elapsed_time >= TIMEOUT_SECONDS:
+                # finalize line then break
+                sys.stdout.write("\n")
+                sys.stdout.flush()
                 print(f"Reached timeout of {TIMEOUT_SECONDS} seconds. Exiting data collection gracefully...")
                 break
+
+            # If enough time has passed and we haven't switched yet, switch frequency
+            if (not switched) and (elapsed_time >= SWITCH_AFTER_SECONDS):
+                sys.stdout.write("\n")
+                sys.stdout.flush()
+                print(f"Switching frequency to {NEW_FREQ} after {SWITCH_AFTER_SECONDS} seconds...")
+                # terminate current process
+                try:
+                    if process.poll() is None:
+                        process.terminate()
+                        process.wait(timeout=5)
+                except Exception:
+                    pass
+
+                # start new nrsc5 at NEW_FREQ
+                current_freq = NEW_FREQ
+                cmd = make_command(current_freq)
+                print(f"Starting command: {' '.join(cmd)}")
+                process = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                switched = True
+
+            # detect if process has exited/crashed
+            poll = process.poll()
+            if poll is not None:
+                sys.stdout.write("\n")
+                sys.stdout.flush()
+                if poll != 0:
+                    print(f"nrsc5 terminated unexpectedly with exit code {poll}. Aborting immediately.")
+                    cleanup_temp()
+                    sys.exit(1)
+                else:
+                    print(f"nrsc5 exited (code {poll}). No more files will be produced.")
+                    break
 
             png_files = glob.glob(os.path.join(TEMP_DIR, "*.png"))
             txt_files = glob.glob(os.path.join(TEMP_DIR, "*.txt"))
@@ -157,19 +215,26 @@ def monitor_and_harvest():
             tmt_count = len(found_tmt_slots)
             txt_count = len(txt_files)
             
-            if tmt_count != last_tmt_count or dwro_count != last_dwro_count or txt_count != last_txt_count:
-                print(f"Progress: {tmt_count}/9 Traffic tiles | {dwro_count}/1 Weather overlay | {txt_count}/2 TXTs")
-                last_tmt_count, last_dwro_count, last_txt_count = tmt_count, dwro_count, txt_count
-            
+            # Print inline progress every loop (keeps terminal compact)
+            prev_len = print_progress_inline(tmt_count, dwro_count, txt_count, current_freq, prev_len, start_time)
+
+            # If targets reached, finalize and exit loop
             if tmt_count >= 9 and dwro_count >= 1 and txt_count >= 2:
+                sys.stdout.write("\n")
+                sys.stdout.flush()
                 print("Target conditions reached successfully!")
                 break
                 
             time.sleep(1)
     finally:
-        print("Terminating nrsc5 process...")
-        process.terminate()
-        process.wait()
+        # Terminate nrsc5 if it's still running
+        try:
+            if process.poll() is None:
+                print("\nTerminating nrsc5 process...")
+                process.terminate()
+                process.wait(timeout=5)
+        except Exception:
+            pass
 
 def parse_gps_coordinates(txt_file_path):
     """Extracts bounding box coordinates from the DWRI text file."""
