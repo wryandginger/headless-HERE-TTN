@@ -72,16 +72,16 @@ def download_basemap(lat1, lon1, lat2, lon2):
     canvas_height = (max_y - min_y + 1) * tile_size
     canvas = Image.new("RGB", (canvas_width, canvas_height))
     
-    # Pulls a grayscale map from TopPlusOpen, provided by the German Federal Agency for Cartography and Geodesy www.bkg.bund.de
-    # This script should comply with all API documentation found here: https://sg.geodatenzentrum.de/public/gdz/dokumentation/eng/TopPlusOpen_eng.pdf
-    # A list of other providers is here: https://wiki.openstreetmap.org/wiki/Raster_tile_providers. 
+    # Pulls a map from an OpenMapTiles API. 
+    # You have to fill this in yourself for legal reasons.
+    # A list of providers is here: https://wiki.openstreetmap.org/wiki/Raster_tile_providers. 
     # Look at the tiles url column and enter on LINE 78
     # Be sure to comply with the api provider rules and update the attribution tag on LINE 293
   
     tile_urls = []
     for x in range(min_x, max_x + 1):
         for y in range(min_y, max_y + 1):
-            url = f"https://sgx.geodatenzentrum.de/wmts_topplus_open/tile/1.0.0/web_grau/default/WEBMERCATOR/{zoom}/{x}/{y}.png"
+            url = f"https://[ENTER THE OSM PROVIDER DETAILS HERE]/{zoom}/{x}/{y}.png"
             tile_urls.append((x, y, url))
     
     print(f"Downloading {len(tile_urls)} tiles at zoom level {zoom}...")
@@ -166,7 +166,7 @@ def monitor_and_harvest():
                 print(f"Reached timeout of {TIMEOUT_SECONDS} seconds. Exiting data collection gracefully...")
                 break
 
-            # If enough time has passed and we haven't caught them all, switch frequency
+            # If enough time has passed and we haven't switched yet, switch frequency
             if (not switched) and (elapsed_time >= SWITCH_AFTER_SECONDS):
                 sys.stdout.write("\n")
                 sys.stdout.flush()
@@ -357,8 +357,7 @@ def crop_and_overlay_weather():
     draw.text((text_x, text_y), timestamp_str, fill="white", font=font)
     
     # Add provider attribution at bottom right in 8pt font
-    # Map data: Data Licence Germany – Attribution – Version 2.0" or "dl-de/by-2-0" with reference to the licence text under www.govdata.de/dl-de/by-2-0
-    attribution_text = "© dl-de/by-2-0 "
+    attribution_text = "© PROVIDER © OpenMapTiles © OpenStreetMap"
     attribution_font = get_large_font(size=8)
     
     # Get text bounding box for centering
