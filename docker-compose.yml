@@ -6,7 +6,11 @@ services:
     container_name: headlesshere
     privileged: true
     volumes:
-      - ${LOCALPATH}:/app  # Define a local mount point for the files and mount as the app folder
+      - ${LOCALPATH}/ttn_osm.py:/app/ttn_osm.py
+      - ${LOCALPATH}/ttn_osm.py:/app/ttn.py
+      - ${LOCALPATH}/ttn_osm.py:/app/here.py
+      - ${LOCALPATH}/ttn_osm.py:/app/gif_ttn.py
+      - ${LOCALPATH}/ttn_osm.py:/app/gif_here.py   
       - /dev/bus/usb:/dev/bus/usb
     environment:
       - TZ=UTC
