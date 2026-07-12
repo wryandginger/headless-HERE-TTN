@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Define user home explicitly since cron runs with a minimal environment
-USER_HOME="/home/USER"
+USER_HOME="/app"
 PYTHON_BIN="/usr/bin/python3"
 
 # Navigate to home directory
