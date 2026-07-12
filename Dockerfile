@@ -44,4 +44,4 @@ RUN pip install --no-cache-dir Pillow
 COPY . .
 
 # Run the specific script requested
-CMD ["/bin/bash", "ttnhere.sh"]
+CMD ["/bin/bash", "/app/ttnhere.sh"]
