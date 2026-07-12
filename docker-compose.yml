@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  headlesshere:
+    build: .
+    container_name: headlesshere
+    volumes:
+      - /dev/bus/usb:/dev/bus/usb
+    environment:
+      - TZ=UTC
+    network_mode: "bridge"
+    restart: always
+    stdin_open: true  
+    tty: true   
