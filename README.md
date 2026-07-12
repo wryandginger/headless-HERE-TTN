@@ -1,7 +1,9 @@
 # headless-HERE-TTN
 A set of python scripts that pull and assemble HERE and TTN Traffic and Weather data from nrsc5.
 This is designed to be run as a cronjob periodically so you can see weather and traffic on a Home Assistant dashboard.
-NEW: You can now run this as a Docker container: Clone the repo. Set an environment variable to LOCALPATH = wherever you cloned the repo. Make your edits and run. 
+
+# NEW: 
+You can now run this as a Docker container: Clone the repo. Set an environment variable to LOCALPATH = wherever you cloned the repo. Make your edits and run. 
 
 - This was vibecoded, but I did my best to clean up the code. Sorry.
 - ttn.py map and coordinate logic were adapted from an old fork of [KYDronePilot/hdfm](https://github.com/KYDronePilot/hdfm), licensed under GPL-3.
