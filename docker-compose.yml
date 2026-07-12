@@ -6,11 +6,7 @@ services:
     container_name: headlesshere
     privileged: true
     volumes:
-      - ${LOCALPATH}/ttn_osm.py:/app/ttn_osm.py
-      - ${LOCALPATH}/ttn_osm.py:/app/ttn.py
-      - ${LOCALPATH}/ttn_osm.py:/app/here.py
-      - ${LOCALPATH}/ttn_osm.py:/app/gif_ttn.py
-      - ${LOCALPATH}/ttn_osm.py:/app/gif_here.py   
+      - ${LOCALPATH}:/app
       - /dev/bus/usb:/dev/bus/usb
     environment:
       - TZ=UTC
