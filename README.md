@@ -1,6 +1,7 @@
 # headless-HERE-TTN
 A set of python scripts that pull and assemble HERE and TTN Traffic and Weather data from nrsc5.
 This is designed to be run as a cronjob periodically so you can see weather and traffic on a Home Assistant dashboard.
+NEW: You can now run this as a Docker container: Clone the repo. Set an environment variable to LOCALPATH = wherever you cloned the repo. Make your edits and run. 
 
 - This was vibecoded, but I did my best to clean up the code. Sorry.
 - ttn.py map and coordinate logic were adapted from an old fork of [KYDronePilot/hdfm](https://github.com/KYDronePilot/hdfm), licensed under GPL-3.
@@ -19,23 +20,23 @@ This is designed to be run as a cronjob periodically so you can see weather and 
 - An installation of Home Assistant with Samba access on a different machine
 
 # What's included:
-- [ttn.py](https://github.com/wryandginger/headless-HERE-TTN/blob/main/ttn.py)  - Runs nrsc5 for up to 5 minutes while the TTN weather and traffice data is received by your SDR. Once the files are received, nrsc5 stops and final images are assembled in ~/outputs/ttn
+- [ttn.py](https://github.com/wryandginger/headless-HERE-TTN/blob/main/ttn.py)  - Runs nrsc5 for up to 5 minutes while the TTN weather and traffice data is received by your SDR. Once the files are received, nrsc5 stops and final images are assembled in /app/outputs/ttn
 - [ttn_osm.py](https://github.com/wryandginger/headless-HERE-TTN/blob/main/ttn_osm.py)  - This is an optional replacement file for ttn.py. Instead of downloading KYDronePilot's map, this manually generates a map using an Open Street Maps compatible API. (Stadia, Carto, ESRI, etc.).
-- [gif_ttn.py](https://github.com/wryandginger/headless-HERE-TTN/blob/main/gif_ttn.py) - Takes the TTN files located in ~/outputs/ttn and:
-   1. Makes a copy of the weather image and saves it in ~/outputs/ttn/gif
+- [gif_ttn.py](https://github.com/wryandginger/headless-HERE-TTN/blob/main/gif_ttn.py) - Takes the TTN files located in /app/outputs/ttn and:
+   1. Makes a copy of the weather image and saves it in /app/outputs/ttn/gif
    2. It creates a gif from the last 15 radar images
    3. Uploads the TTN traffic, weather, and gif to /config/www/ttn on your Home Assistant instance
    4. Cleans up / deletes the files you uploaded from the server
 - [HERE.py](https://github.com/wryandginger/headless-HERE-TTN/blob/main/here.py)  - Runs nrsc5 for up to 5 minutes while the HERE weather and traffice data is received by your SDR. Once the files are received, nrsc5 stops and final images are assembled in ~/outputs/here
-- [gif_here.py](https://github.com/wryandginger/headless-HERE-TTN/blob/main/gif_here.py) - Takes the here files located in ~/outputs/here and:
-   1. Makes a copy of the weather image and saves it in ~/outputs/here/gif
+- [gif_here.py](https://github.com/wryandginger/headless-HERE-TTN/blob/main/gif_here.py) - Takes the here files located in /app/outputs/here and:
+   1. Makes a copy of the weather image and saves it in /app/outputs/here/gif
    2. It creates a gif from the last 15 radar images
    3. Uploads the TTN traffic, weather, and gif to /config/www/here on your Home Assistant instance
    4. Cleans up / deletes the files you uploaded from the server
 - [ttnhere.sh](https://github.com/wryandginger/headless-HERE-TTN/blob/main/ttnhere.sh)  - A bash script that first runs the TTN and then the HERE python files, takes a break and then restarts in an endless loop.
 
 
-# How To Install and Run:
+# How To Install and Run (not Docker):
 1. Download the contents of this repo to the home directory of your linux install
 2. Edit ttn.py, ttn_osm.py, and/or here.py for your desired frequency and timezone. (These are automatically configured for Seattle, WA)
    - ttn.py requires tuning to an iHeartRadio station (95.7 MHz or 106.1 MHz in Seattle)
