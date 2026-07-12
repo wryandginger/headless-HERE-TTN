@@ -1,20 +1,16 @@
 FROM python:3.9-slim
 
-# Set working directory
 WORKDIR /app
 
-# Install system dependencies required to build libnrsc5 and run python
+# 1. Install standard build tools and dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     build-essential \
     cmake \
-    autoconf \
-    libtool \
+    pkg-config \
     libao-dev \
     libfftw3-dev \
     librtlsdr-dev \
-    libusb-1.0-0-dev \
-    pkg-config \
     ffmpeg \
     usbutils \
     udev \
@@ -24,24 +20,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     smbclient \
     && rm -rf /var/lib/apt/lists/*
 
-# Clone and compile libnrsc5 (The core C library)
-RUN git clone https://github.com/theori-io/nrsc5.git /tmp/nrsc5 \
-    && cd /tmp/nrsc5 \
-    && mkdir build && cd build \
-    && cmake -DCMAKE_INCLUDE_PATH=/usr/include -DCMAKE_LIBRARY_PATH=/usr/lib .. \
-    && make -j$(nproc) \
-    && make install \
-    && ldconfig \
-    && rm -rf /tmp/nrsc5
+# 2. Simplistic code compilation using generic root fallback paths
+RUN git clone https://github.com/theori-io/nrsc5.git /tmp/nrsc5 && \
+    mkdir -p /tmp/nrsc5/build && \
+    cd /tmp/nrsc5/build && \
+    cmake -DCMAKE_FIND_ROOT_PATH=/usr .. && \
+    make && \
+    make install && \
+    ldconfig && \
+    rm -rf /tmp/nrsc5
 
-# Install Python dependencies
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel
-RUN pip install --no-cache-dir Pillow
-# If no requirements.txt exists in the repo, uncomment the line below instead:
-# RUN pip install --no-cache-dir flask
+# 3. Python dependencies
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir Pillow
 
-# Copy the application code
+# 4. Copy app code and execute
 COPY . .
 RUN sed -i 's/\r$//' ttnhere.sh
-# Run the specific script requested
-CMD bash ttnhere.sh
+
+CMD ["bash", "ttnhere.sh"]
