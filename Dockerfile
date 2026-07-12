@@ -1,13 +1,9 @@
-FROM python:3.9-slim
+FROM python:3.9
 
 WORKDIR /app
 
-# 1. Install standard build tools and dependencies
+# 1. Install standard runtime tools and hardware packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
-    build-essential \
-    cmake \
-    pkg-config \
     libao-dev \
     libfftw3-dev \
     librtlsdr-dev \
@@ -20,11 +16,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     smbclient \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Simplistic code compilation using generic root fallback paths
+# 2. Compile nrsc5 without any complex path flags
 RUN git clone https://github.com/theori-io/nrsc5.git /tmp/nrsc5 && \
-    mkdir -p /tmp/nrsc5/build && \
-    cd /tmp/nrsc5/build && \
-    cmake -DCMAKE_FIND_ROOT_PATH=/usr .. && \
+    cd /tmp/nrsc5 && \
+    mkdir build && cd build && \
+    cmake .. && \
     make && \
     make install && \
     ldconfig && \
