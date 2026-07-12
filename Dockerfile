@@ -42,6 +42,6 @@ RUN pip install --no-cache-dir Pillow
 
 # Copy the application code
 COPY . .
-
+RUN sed -i 's/\r$//' ttnhere.sh
 # Run the specific script requested
-CMD bash /app/ttnhere.sh
+CMD bash ttnhere.sh
