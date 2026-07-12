@@ -2,8 +2,11 @@ FROM python:3.9
 
 WORKDIR /app
 
-# 1. Install standard runtime tools and hardware packages
+# 1. Install build engines, compilers, and hardware packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    cmake \
+    build-essential \
     libao-dev \
     libfftw3-dev \
     librtlsdr-dev \
@@ -16,7 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     smbclient \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Compile nrsc5 without any complex path flags
+# 2. Compile nrsc5 cleanly without any complex setup
 RUN git clone https://github.com/theori-io/nrsc5.git /tmp/nrsc5 && \
     cd /tmp/nrsc5 && \
     mkdir build && cd build && \
@@ -34,4 +37,5 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
 COPY . .
 RUN sed -i 's/\r$//' ttnhere.sh
 
+CMD ["bash", "ttnhere.sh"]
 CMD ["bash", "ttnhere.sh"]
