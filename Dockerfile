@@ -1,17 +1,20 @@
-FROM python:3.9
+FROM python:3.9-slim
 
+# Set working directory
 WORKDIR /app
 
-# 1. Install build tools, compilers, and image libraries for Pillow
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install system dependencies required to build libnrsc5 and run python
+RUN apt-get update && apt-get install -y \
     git \
-    cmake \
     build-essential \
+    cmake \
+    autoconf \
+    libtool \
     libao-dev \
     libfftw3-dev \
     librtlsdr-dev \
-    libjpeg-dev \
-    zlib1g-dev \
+    libusb-1.0-0-dev \
+    pkg-config \
     ffmpeg \
     usbutils \
     udev \
@@ -21,22 +24,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     smbclient \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Compile nrsc5 with the exact full URL path
-RUN git clone https://github.com /tmp/nrsc5 && \
-    cd /tmp/nrsc5 && \
-    mkdir build && cd build && \
-    cmake .. && \
-    make && \
-    make install && \
-    ldconfig && \
-    rm -rf /tmp/nrsc5
+# Clone and compile libnrsc5 (The core C library)
+RUN git clone https://github.com/theori-io/nrsc5.git /tmp/nrsc5 \
+    && cd /tmp/nrsc5 \
+    && mkdir build && cd build \
+    && cmake .. \
+    && make \
+    && make install \
+    && ldconfig \
+    && rm -rf /tmp/nrsc5
 
-# 3. Rebuild Pillow to link against the newly added image libraries
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir --force-reinstall Pillow
+# Install Python dependencies
+RUN pip install Pillow
 
-# 4. Copy app code and run execution script
+# If no requirements.txt exists in the repo, uncomment the line below instead:
+# RUN pip install --no-cache-dir flask
+
+# Copy the application code
 COPY . .
-RUN sed -i 's/\r$//' ttnhere.sh
 
-CMD ["bash", "ttnhere.sh"]
+# Run the specific script requested
+CMD ["/bin/bash", "ttnhere.sh"]
