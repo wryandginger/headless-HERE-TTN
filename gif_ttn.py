@@ -15,7 +15,7 @@ SMB_USER = "USER"
 SMB_PASS = "PASS"
 
 # Local Directory Settings
-BASE_DIR = os.path.expanduser("~/outputs")
+BASE_DIR = os.path.expanduser("/app/outputs")
 SOURCE_DIR = os.path.join(BASE_DIR, "ttn")
 GIF_DIR = os.path.join(SOURCE_DIR, "gif")
 
