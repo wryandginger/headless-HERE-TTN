@@ -10,7 +10,6 @@ services:
       - /dev/bus/usb:/dev/bus/usb
     environment:
       - TZ=UTC
-      - PYTHONPATH=/usr/local/lib/python3.9/site-packages
     network_mode: "bridge"
     restart: always
     stdin_open: true  
