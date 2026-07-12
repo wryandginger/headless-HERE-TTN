@@ -15,3 +15,5 @@ services:
     restart: always
     stdin_open: true  
     tty: true   
+    command: >
+      bash -c "sed -i 's/\r$$//' /app/ttnhere.sh && bash /app/ttnhere.sh"
