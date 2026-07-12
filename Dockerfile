@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y \
     libfftw3-dev \
     librtlsdr-dev \
     libusb-1.0-0-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    libpng-dev \
     pkg-config \
     ffmpeg \
     usbutils \
