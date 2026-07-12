@@ -2,7 +2,7 @@ FROM python:3.9
 
 WORKDIR /app
 
-# 1. Install build engines, compilers, and hardware packages
+# 1. Added libjpeg-dev and zlib1g-dev for Pillow
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     cmake \
@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libao-dev \
     libfftw3-dev \
     librtlsdr-dev \
+    libjpeg-dev \
+    zlib1g-dev \
     ffmpeg \
     usbutils \
     udev \
@@ -19,8 +21,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     smbclient \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Compile nrsc5 cleanly without any complex setup
-RUN git clone https://github.com/theori-io/nrsc5.git /tmp/nrsc5 && \
+# 2. Compile nrsc5
+RUN git clone https://github.com /tmp/nrsc5 && \
     cd /tmp/nrsc5 && \
     mkdir build && cd build && \
     cmake .. && \
@@ -29,11 +31,15 @@ RUN git clone https://github.com/theori-io/nrsc5.git /tmp/nrsc5 && \
     ldconfig && \
     rm -rf /tmp/nrsc5
 
-# 3. Python dependencies
+# 3. Force pip to rebuild Pillow with the new image libraries
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir Pillow
+    pip install --no-cache-dir --force-reinstall Pillow
 
 # 4. Copy app code and execute
+COPY . .
+RUN sed -i 's/\r$//' ttnhere.sh
+
+CMD ["bash", "ttnhere.sh"]
 COPY . .
 RUN sed -i 's/\r$//' ttnhere.sh
 
