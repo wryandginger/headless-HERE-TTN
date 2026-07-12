@@ -15,10 +15,10 @@ from PIL import Image, ImageDraw, ImageFont
 # --- Configuration ---
 FREQ = "95.7"
 CHANNEL = "0"
-TEMP_DIR = os.path.expanduser("~/temp")
+TEMP_DIR = os.path.expanduser("/app/temp")
 MAP_DIR = os.path.join(TEMP_DIR, "map")
 MAP_PATH = os.path.join(MAP_DIR, "map.png")
-DEST_DIR = os.path.expanduser("~/outputs/ttn")
+DEST_DIR = os.path.expanduser("/app/outputs/ttn")
 TZ = "America/Los_Angeles"
 TIMEOUT_SECONDS = 400  # Give up after 400 sec
 
