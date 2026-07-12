@@ -28,8 +28,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN git clone https://github.com/theori-io/nrsc5.git /tmp/nrsc5 \
     && cd /tmp/nrsc5 \
     && mkdir build && cd build \
-    && cmake .. \
-    && make \
+    && cmake -DCMAKE_INCLUDE_PATH=/usr/include -DCMAKE_LIBRARY_PATH=/usr/lib .. \
+    && make -j$(nproc) \
     && make install \
     && ldconfig \
     && rm -rf /tmp/nrsc5
