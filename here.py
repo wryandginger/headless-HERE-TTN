@@ -12,7 +12,7 @@ from zoneinfo import ZoneInfo
 from PIL import Image, ImageDraw, ImageFont
 
 # Configurations
-HOME_DIR = Path.home()
+HOME_DIR = Path("/app")
 TEMP_DIR = HOME_DIR / "temp"
 DEST_DIR = HOME_DIR / "outputs/here"
 TARGET_COUNT = 10
