@@ -4,6 +4,7 @@ services:
   headlesshere:
     build: .
     container_name: headlesshere
+    privileged: true
     volumes:
       - /dev/bus/usb:/dev/bus/usb
     environment:
