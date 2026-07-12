@@ -2,7 +2,7 @@
 
 # Define user home explicitly since cron runs with a minimal environment
 USER_HOME="/app"
-PYTHON_BIN="/usr/bin/python3"
+PYTHON_BIN="/usr/local/bin/python"
 
 # Navigate to the defined home directory
 cd "$USER_HOME"
