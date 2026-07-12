@@ -6,7 +6,7 @@ services:
     container_name: headlesshere
     privileged: true
     volumes:
-      - /mnt/headless-HERE-TTN-main:/app  #Define a local mount point for the files and mount as the app folder
+      - ${LOCALPATH}:/app  # Define a local mount point for the files and mount as the app folder
       - /dev/bus/usb:/dev/bus/usb
     environment:
       - TZ=UTC
