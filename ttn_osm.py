@@ -353,7 +353,7 @@ def crop_and_overlay_weather():
     text_y = 512 - text_h - 10
     
     draw.rectangle([text_x - 5, text_y - 2, 502, 502], fill="black")
-    draw.text((text_x, text_y), timestamp_str, fill="gray", font=font)
+    draw.text((text_x, text_y), timestamp_str, fill="white", font=font)
     
     # Add provider attribution at bottom right in 8pt font
     attribution_text = "© BKG © OpenStreetMap"
@@ -366,7 +366,7 @@ def crop_and_overlay_weather():
     attr_y = 512 - 9
 
     # Attribution Text Fill Color should be set so it doesn't stick out too much.
-    draw.text((attr_x, attr_y), attribution_text, fill="gray", font=attribution_font)
+    draw.text((attr_x, attr_y), attribution_text, fill="black", font=attribution_font)
     
     final_weather.save(os.path.join(TEMP_DIR, "weatherimgTTN.png"))
     print("Weather map generated successfully with timestamp and attribution.")
