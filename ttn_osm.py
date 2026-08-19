@@ -72,16 +72,15 @@ def download_basemap(lat1, lon1, lat2, lon2):
     canvas_height = (max_y - min_y + 1) * tile_size
     canvas = Image.new("RGB", (canvas_width, canvas_height))
     
-    # Pulls a map from an OpenMapTiles API. 
-    # You have to fill this in yourself for legal reasons.
+    # Pulls a map from the German Federal Agency for Cartography and Geodesy. 
+    # You can change this to a different style (web, web_grau) or change the provider
     # A list of providers is here: https://wiki.openstreetmap.org/wiki/Raster_tile_providers. 
-    # Look at the tiles url column and enter on LINE 78
     # Be sure to comply with the api provider rules and update the attribution tag on LINE 293
   
     tile_urls = []
     for x in range(min_x, max_x + 1):
         for y in range(min_y, max_y + 1):
-            url = f"https://[ENTER THE OSM PROVIDER DETAILS HERE]/{zoom}/{x}/{y}.png"
+            url = f"https://sgx.geodatenzentrum.de/wmts_topplus_open/tile/1.0.0/web_grau/default/WEBMERCATOR/{zoom}/{y}/{x}.png"
             tile_urls.append((x, y, url))
     
     print(f"Downloading {len(tile_urls)} tiles at zoom level {zoom}...")
@@ -354,10 +353,10 @@ def crop_and_overlay_weather():
     text_y = 512 - text_h - 10
     
     draw.rectangle([text_x - 5, text_y - 2, 502, 502], fill="black")
-    draw.text((text_x, text_y), timestamp_str, fill="white", font=font)
+    draw.text((text_x, text_y), timestamp_str, fill="gray", font=font)
     
     # Add provider attribution at bottom right in 8pt font
-    attribution_text = "© PROVIDER © OpenMapTiles © OpenStreetMap"
+    attribution_text = "© BKG © OpenStreetMap"
     attribution_font = get_large_font(size=8)
     
     # Get text bounding box for centering
