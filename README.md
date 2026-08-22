@@ -7,7 +7,7 @@ You can now run this as a Docker container: Clone the repo. Set an environment v
 
 - This was vibecoded, but I did my best to clean up the code. Sorry.
 - ttn.py map and coordinate logic were adapted from an old fork of [KYDronePilot/hdfm](https://github.com/KYDronePilot/hdfm), licensed under GPL-3.
-- ttn_osm.py is an optional replacement of ttn.py using the [TopPlusOpen](https://gdz.bkg.bund.de/index.php/default/webdienste/topplusopen-produkte/wmts-topplusopen-wmts-topplus-open.html) map (© BKG, [dl-de/by-2-0](https://www.govdata.de/dl-de/by-2-0)) to generate a custom map.
+- ttn_osm.py is an optional replacement of ttn.py using the [TopPlusOpen](https://gdz.bkg.bund.de/index.php/default/webdienste/topplusopen-produkte/wmts-topplusopen-wmts-topplus-open.html) map (© [BKG](https://www.bkg.bund.de), [dl-de/by-2-0](https://www.govdata.de/dl-de/by-2-0), using these [data sources](https://sgx.geodatenzentrum.de/web_public/gdz/datenquellen/datenquellen_topplusopen.html)) to generate a custom map.
   
 <div align="center">
    <img src="https://github.com/wryandginger/headless-HERE-TTN/blob/main/temp/trafficmapTTN.png?raw=true" width=30%">
@@ -39,14 +39,14 @@ You can now run this as a Docker container: Clone the repo. Set an environment v
 
 
 # How To Install and Run (not Docker):
-1. Download the contents of this repo to the home directory of your linux install
-2. Edit ttn.py, ttn_osm.py, and/or here.py for your desired frequency and timezone. (These are automatically configured for Seattle, WA)
+1. Download the contents of this repo to the home directory of your Linux install
+2. Edit ttn.py, ttn_osm.py, and/or here.py for your desired frequency and time zone. (These are automatically configured for Seattle, WA)
    - ttn.py requires tuning to an iHeartRadio station (95.7 MHz or 106.1 MHz in Seattle)
    - here.py requires tuning to an Audacy station (99.9 MHz or 100.7 in Seattle) or Bonneville station (97.3 MHz in Seattle)
   
    NEW / Optional:
    - ttn_osm.py is preconfigured for the greyscale TopPlusOpen Map, you can change this to another provider if desired.
-   - [TopPlusOpen](https://gdz.bkg.bund.de/index.php/default/webdienste/topplusopen-produkte/wmts-topplusopen-wmts-topplus-open.html) map is provided for free under this license agreement: (© BKG, [dl-de/by-2-0](https://www.govdata.de/dl-de/by-2-0))
+   - [TopPlusOpen](https://gdz.bkg.bund.de/index.php/default/webdienste/topplusopen-produkte/wmts-topplusopen-wmts-topplus-open.html) map, using these [data sources](https://sgx.geodatenzentrum.de/web_public/gdz/datenquellen/datenquellen_topplusopen.html) is provided for free under this license agreement: (© [BKG](https://www.bkg.bund.de), [dl-de/by-2-0](https://www.govdata.de/dl-de/by-2-0))
    
 4. Edit gif_ttn.py and/or gif_here.py for the IP and Samba credentials of your Home Assistant instance
 5. Edit the ttnhere.sh script so it directs to the correct home directory
