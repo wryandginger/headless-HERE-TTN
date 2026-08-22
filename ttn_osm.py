@@ -72,10 +72,14 @@ def download_basemap(lat1, lon1, lat2, lon2):
     canvas_height = (max_y - min_y + 1) * tile_size
     canvas = Image.new("RGB", (canvas_width, canvas_height))
     
-    # Pulls a map from the German Federal Agency for Cartography and Geodesy. 
-    # You can change this to a different style (web, web_grau) or change the provider
+    # Pulls a map from the German Federal Agency for Cartography and Geodesy WMTS TopPlusOpen Map
+    # © BKG, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0)
+    # The final generated map is considered a derivitave work due to the addition of the timestamp and weather layering.
+    # These comments and the image attribution are my best attempts at compliance with the license agreement.
+    
+    # You can change this map to a different style (web, web_grau) or change the provider
     # A list of providers is here: https://wiki.openstreetmap.org/wiki/Raster_tile_providers. 
-    # Be sure to comply with the api provider rules and update the attribution tag on LINE 293
+    # Be sure to comply with the api provider rules and update the attribution tag on LINE 293 if you change providers.
   
     tile_urls = []
     for x in range(min_x, max_x + 1):
@@ -356,7 +360,7 @@ def crop_and_overlay_weather():
     draw.text((text_x, text_y), timestamp_str, fill="white", font=font)
     
     # Add provider attribution at bottom right in 8pt font
-    attribution_text = "© BKG © OpenStreetMap"
+    attribution_text = "© BKG, dl-de/by-2-0"
     attribution_font = get_large_font(size=8)
     
     # Get text bounding box for centering
