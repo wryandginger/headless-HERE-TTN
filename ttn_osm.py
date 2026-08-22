@@ -74,6 +74,7 @@ def download_basemap(lat1, lon1, lat2, lon2):
     
     # Pulls a map from the German Federal Agency for Cartography and Geodesy WMTS TopPlusOpen Map
     # © BKG, dl-de/by-2-0 (https://www.govdata.de/dl-de/by-2-0)
+    # Data sources: "https://sgx.geodatenzentrum.de/web_public/gdz/datenquellen/datenquellen_topplusopen.html"
     # The final generated map is considered a derivitave work due to the addition of the timestamp and weather layering.
     # These comments and the image attribution are my best attempts at compliance with the license agreement.
     
